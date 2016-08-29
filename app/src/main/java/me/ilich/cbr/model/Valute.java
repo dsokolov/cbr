@@ -18,8 +18,16 @@ public class Valute {
         this.value = value;
     }
 
+    public String getAud() {
+        return aud;
+    }
+
     public int getNominal() {
         return nominal;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public double getValue() {
