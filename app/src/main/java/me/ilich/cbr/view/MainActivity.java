@@ -8,11 +8,13 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.text.DecimalFormat;
 
@@ -27,8 +29,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("###.##");
 
-    private Valute sourceValute = new Valute("", "", "", 1, "Рубли", 1.0);
-    private Valute targetValute = new Valute("", "", "", 1, "Доллары США", 64.0);
+    private Valute sourceValute = new Valute("", "", "RUR", 1, "Рубли", 1.0);
+    private Valute targetValute = new Valute("", "", "USD", 1, "Доллары США", 64.0);
 
     private ViewGroup containerConverter;
     private TextInputLayout sourceTextInputLayout;
@@ -37,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText targetEditText;
     private Button sourceChangeButton;
     private Button targetChangeButton;
+    private TextView detailsTextView;
 
     private SourceToTargetTextWatcher sourceToTargetTextWatcher = new SourceToTargetTextWatcher();
     private TargetToSourceTextWatcher targetToSourceTextWatcher = new TargetToSourceTextWatcher();
@@ -56,9 +59,11 @@ public class MainActivity extends AppCompatActivity {
         }
         sourceChangeButton = (Button) findViewById(R.id.change_source_valute);
         targetChangeButton = (Button) findViewById(R.id.change_target_valute);
+        detailsTextView = (TextView) findViewById(R.id.details);
         sourceEditText.addTextChangedListener(sourceToTargetTextWatcher);
         targetEditText.addTextChangedListener(targetToSourceTextWatcher);
-        processControllsState();
+        processButtonsLabels();
+        processDetailsText();
     }
 
     @Override
@@ -71,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
             }
             sourceValute = valute;
             sourceTextInputLayout.requestFocus();
-            processControllsState();
+            processButtonsLabels();
             convertFromTargetToSource();
         } else if (requestCode == REQUEST_CODE_SELECT_TARGET_VALUTE && resultCode == Activity.RESULT_OK) {
             Valute valute = ValuteListActivity.extractValute(data);
@@ -80,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
             }
             targetValute = valute;
             targetTextInputLayout.requestFocus();
-            processControllsState();
+            processButtonsLabels();
             convertFromTargetToSource();
         }
     }
@@ -93,9 +98,19 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(ValuteListActivity.intent(this), REQUEST_CODE_SELECT_TARGET_VALUTE);
     }
 
-    private void processControllsState() {
+    private void processButtonsLabels() {
         sourceChangeButton.setText(sourceValute.getName());
         targetChangeButton.setText(targetValute.getName());
+    }
+
+    private void processDetailsText() {
+        if (TextUtils.isEmpty(sourceEditText.getText().toString())) {
+            detailsTextView.setText(R.string.main_details_enter_source_amount);
+        } else {
+            String s = getString(R.string.main_details_pattern);
+            String details = String.format(s, sourceEditText.getText().toString(), sourceValute.getCharCode(), targetEditText.getText().toString(), targetValute.getCharCode());
+            detailsTextView.setText(details);
+        }
     }
 
 
@@ -109,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
             targetEditText.getText().clear();
         }
         targetEditText.addTextChangedListener(targetToSourceTextWatcher);
+        processDetailsText();
     }
 
 
@@ -122,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
             sourceEditText.getText().clear();
         }
         sourceEditText.addTextChangedListener(sourceToTargetTextWatcher);
+        processDetailsText();
     }
 
     private class SourceToTargetTextWatcher implements TextWatcher {

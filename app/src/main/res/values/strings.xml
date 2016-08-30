@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">ЦБР</string>
     <string name="main_title">Конвертер валют ЦБР</string>
+    <string name="main_source_hint">Сумма в исходной валюте</string>
+    <string name="main_target_hint">Сумма в целевой валюте</string>
+    <string name="main_details_enter_source_amount">Введите сумму в исходной валюте</string>
+    <string name="main_details_pattern">%1$s %2$s = %3$s %4$s</string>
 </resources>
