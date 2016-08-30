@@ -31,5 +31,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.2.0'
     compile 'com.android.support:design:24.2.0'
     compile 'com.android.support:recyclerview-v7:24.2.0'
+    compile 'org.simpleframework:simple-xml:2.7.1'
 
 }

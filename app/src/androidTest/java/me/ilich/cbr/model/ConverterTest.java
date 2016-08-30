@@ -68,6 +68,9 @@ public class ConverterTest {
 
         assertEquals(1.0, converter.convert(new Valute("", "", "", 1, "", 1.0), new Valute("", "", "", 1, "", 1.0), 1.0), delta);
 
+        assertEquals(10.0, converter.convert(d.usd, d.usd, 10.0), delta);
+        assertEquals(10.0, converter.convert(d.rur, d.rur, 10.0), delta);
+
         assertEquals(1.54, converter.convert(d.rur, d.usd, 100.0), delta);
         assertEquals(6473.8, converter.convert(d.usd, d.rur, 100.0), delta);
 
