@@ -2,6 +2,7 @@ package me.ilich.cbr.model;
 
 import android.support.test.runner.AndroidJUnit4;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -11,14 +12,18 @@ import static junit.framework.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 public class ValuteTest {
 
+    private Data d;
+
+    @Before
+    public void setUp() {
+        d = new Data();
+    }
+
     @Test
     public void equalsTest() {
-        Valute a = new Valute("idA", "codeA", "audA", 1, "A", 1.0);
-        Valute b = new Valute("idA", "codeA", "audA", 1, "A", 1.0);
-        Valute c = new Valute("idC", "codeC", "audC", 3, "C", 2.0);
-        assertTrue(a.equals(a));
-        assertTrue(a.equals(b));
-        assertFalse(a.equals(c));
+        assertTrue(d.valuteA1.equals(d.valuteA1));
+        assertTrue(d.valuteA1.equals(d.valuteA2));
+        assertFalse(d.valuteA1.equals(d.valuteC));
 
     }
 

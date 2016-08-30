@@ -7,6 +7,8 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -18,8 +20,14 @@ import me.ilich.cbr.model.Valute;
 
 public class ValuteListActivity extends AppCompatActivity {
 
+    public static String EXTRA_VALUTE = "valute";
+
     public static Intent intent(Context context) {
         return new Intent(context, ValuteListActivity.class);
+    }
+
+    public static Valute extractValute(Intent intent) {
+        return intent.getParcelableExtra(EXTRA_VALUTE);
     }
 
     private Adapter adapter = new Adapter();
@@ -29,6 +37,7 @@ public class ValuteListActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_valute_list);
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.valute_list);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -46,6 +55,19 @@ public class ValuteListActivity extends AppCompatActivity {
             codeTextView = (TextView) itemView.findViewById(R.id.valute_code);
         }
 
+        public void fill(final Valute valute) {
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent data = new Intent();
+                    data.putExtra(EXTRA_VALUTE, valute);
+                    setResult(RESULT_OK, data);
+                }
+            });
+            titleTextView.setText(valute.getName());
+            codeTextView.setText(valute.getCharCode());
+        }
+
     }
 
     private class Adapter extends RecyclerView.Adapter<ViewHolder> {
@@ -58,8 +80,7 @@ public class ValuteListActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             Valute valute = valutes.get(position);
-            holder.titleTextView.setText(valute.getName());
-            holder.codeTextView.setText(valute.getCharCode());
+            holder.fill(valute);
         }
 
         @Override

@@ -38,4 +38,25 @@ public class ValCurs {
         return valute;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ValCurs valCurs = (ValCurs) o;
+
+        if (date != null ? !date.equals(valCurs.date) : valCurs.date != null) return false;
+        if (name != null ? !name.equals(valCurs.name) : valCurs.name != null) return false;
+        return valute != null ? valute.equals(valCurs.valute) : valCurs.valute == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = date != null ? date.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (valute != null ? valute.hashCode() : 0);
+        return result;
+    }
+
 }

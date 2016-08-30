@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Cbr</string>
+    <string name="app_name">ЦБР</string>
+    <string name="main_title">Конвертер валют ЦБР</string>
 </resources>
