@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.ilich.cbr.R;
+import me.ilich.cbr.model.Model;
 import me.ilich.cbr.model.Valute;
 
 public class ValuteListActivity extends AppCompatActivity {
@@ -38,10 +39,10 @@ public class ValuteListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_valute_list);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        valutes.addAll(Model.getInstance().getValutes());
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.valute_list);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        //TODO заполнить список
     }
 
     private class ViewHolder extends RecyclerView.ViewHolder {
@@ -62,6 +63,7 @@ public class ValuteListActivity extends AppCompatActivity {
                     Intent data = new Intent();
                     data.putExtra(EXTRA_VALUTE, valute);
                     setResult(RESULT_OK, data);
+                    finish();
                 }
             });
             titleTextView.setText(valute.getName());
