@@ -59,7 +59,7 @@ public class ValuteListActivity extends AppCompatActivity {
         public void onBindViewHolder(ViewHolder holder, int position) {
             Valute valute = valutes.get(position);
             holder.titleTextView.setText(valute.getName());
-            holder.codeTextView.setText(valute.getAud());
+            holder.codeTextView.setText(valute.getCharCode());
         }
 
         @Override
