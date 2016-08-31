@@ -48,7 +48,6 @@ public class CacheTest {
         cache.replace(valCurs);
         ValCurs cached = cache.get();
         assertEquals(valCurs, cached);
-        assertTrue(valCurs != cached);
     }
 
 }

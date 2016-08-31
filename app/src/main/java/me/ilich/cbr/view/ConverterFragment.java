@@ -20,22 +20,31 @@ import java.text.DecimalFormat;
 
 import me.ilich.cbr.R;
 import me.ilich.cbr.model.Model;
+import me.ilich.cbr.model.ValCurs;
 import me.ilich.cbr.model.Valute;
 
 public class ConverterFragment extends Fragment implements View.OnClickListener {
 
     private static final int REQUEST_CODE_SELECT_SOURCE_VALUTE = 1;
     private static final int REQUEST_CODE_SELECT_TARGET_VALUTE = 2;
+    private static final String STATE_SOURCE_VALUTE = "source valute";
+    private static final String STATE_TARGET_VALUTE = "target valute";
+
+    private static final String ARG_CONTENT = "content";
 
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("###.##");
 
-    public static ConverterFragment create() {
-        return new ConverterFragment();
+    public static ConverterFragment create(ValCurs content) {
+        ConverterFragment converterFragment = new ConverterFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ARG_CONTENT, content);
+        converterFragment.setArguments(bundle);
+        return converterFragment;
     }
 
-
-    private Valute sourceValute = new Valute("", "", "RUR", 1, "Рубли", 1.0);
-    private Valute targetValute = new Valute("", "", "USD", 1, "Доллары США", 64.0);
+    private ValCurs valCurs;
+    private Valute sourceValute;
+    private Valute targetValute;
 
     private TextInputLayout sourceTextInputLayout;
     private TextInputLayout targetTextInputLayout;
@@ -47,6 +56,55 @@ public class ConverterFragment extends Fragment implements View.OnClickListener 
 
     private SourceToTargetTextWatcher sourceToTargetTextWatcher = new SourceToTargetTextWatcher();
     private TargetToSourceTextWatcher targetToSourceTextWatcher = new TargetToSourceTextWatcher();
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_SELECT_SOURCE_VALUTE && resultCode == Activity.RESULT_OK) {
+            Valute valute = ValuteListActivity.extractValute(data);
+            if (valute.equals(targetValute)) {
+                targetValute = sourceValute;
+            }
+            sourceValute = valute;
+            sourceTextInputLayout.requestFocus();
+            processButtonsLabels();
+            convertFromTargetToSource();
+        } else if (requestCode == REQUEST_CODE_SELECT_TARGET_VALUTE && resultCode == Activity.RESULT_OK) {
+            Valute valute = ValuteListActivity.extractValute(data);
+            if (valute.equals(sourceValute)) {
+                sourceValute = targetValute;
+            }
+            targetValute = valute;
+            targetTextInputLayout.requestFocus();
+            processButtonsLabels();
+            convertFromTargetToSource();
+        }
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState == null) {
+            valCurs = getArguments().getParcelable(ARG_CONTENT);
+            for (Valute valute : valCurs.getValute()) {
+                if (valute.getCharCode().equals("RUR")) {
+                    sourceValute = valute;
+                }
+                if (valute.getCharCode().equals("USD")) {
+                    targetValute = valute;
+                }
+            }
+            if (sourceValute == null) {
+                sourceValute = valCurs.getValute().get(0);
+            }
+            if (targetValute == null) {
+                targetValute = valCurs.getValute().get(1);
+            }
+        } else {
+            sourceValute = savedInstanceState.getParcelable(STATE_SOURCE_VALUTE);
+            targetValute = savedInstanceState.getParcelable(STATE_TARGET_VALUTE);
+        }
+    }
 
     @Nullable
     @Override
@@ -77,27 +135,10 @@ public class ConverterFragment extends Fragment implements View.OnClickListener 
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_SELECT_SOURCE_VALUTE && resultCode == Activity.RESULT_OK) {
-            Valute valute = ValuteListActivity.extractValute(data);
-            if (valute.equals(targetValute)) {
-                targetValute = sourceValute;
-            }
-            sourceValute = valute;
-            sourceTextInputLayout.requestFocus();
-            processButtonsLabels();
-            convertFromTargetToSource();
-        } else if (requestCode == REQUEST_CODE_SELECT_TARGET_VALUTE && resultCode == Activity.RESULT_OK) {
-            Valute valute = ValuteListActivity.extractValute(data);
-            if (valute.equals(sourceValute)) {
-                sourceValute = targetValute;
-            }
-            targetValute = valute;
-            targetTextInputLayout.requestFocus();
-            processButtonsLabels();
-            convertFromTargetToSource();
-        }
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(STATE_SOURCE_VALUTE, sourceValute);
+        outState.putParcelable(STATE_TARGET_VALUTE, targetValute);
     }
 
     @Override

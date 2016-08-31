@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_alignParentBottom="true"
-    android:layout_below="@id/container_toolbar"
-    android:orientation="vertical"
-    android:padding="@dimen/content_padding">
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_alignParentBottom="true"
+              android:layout_below="@id/container_toolbar"
+              android:orientation="vertical"
+              android:padding="@dimen/content_padding">
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/amount_source"
@@ -15,11 +15,12 @@
         android:hint="@string/main_source_hint">
 
         <EditText
+            android:id="@+id/amount_source_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="numberDecimal"
-            tools:text="100.0" />
+            tools:text="100.0"/>
 
     </android.support.design.widget.TextInputLayout>
 
@@ -29,7 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="onChangeSourceValuteClick"
-        tools:text="Рубли" />
+        tools:text="Рубли"/>
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/amount_target"
@@ -38,11 +39,12 @@
         android:hint="@string/main_target_hint">
 
         <EditText
+            android:id="@+id/amount_target_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="numberDecimal"
-            tools:text="100.0" />
+            tools:text="100.0"/>
 
     </android.support.design.widget.TextInputLayout>
 
@@ -52,7 +54,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="onChangeTargetValuteClick"
-        tools:text="Доллары США" />
+        tools:text="Доллары США"/>
 
     <TextView
         android:id="@+id/details"
@@ -60,6 +62,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        tools:text="100 RUR = 6400 USD" />
+        tools:text="100 RUR = 6400 USD"/>
 
 </LinearLayout>

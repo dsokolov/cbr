@@ -15,7 +15,7 @@ public class ServiceIntegration {
         while ((length = inputStream.read(buffer)) != -1) {
             result.write(buffer, 0, length);
         }
-        return result.toString("UTF-8");
+        return result.toString("Windows-1251");
     }
 
     public String daily() throws IntegrationException {

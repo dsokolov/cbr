@@ -3,6 +3,7 @@ package me.ilich.cbr.model;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
@@ -11,11 +12,21 @@ import android.support.v4.content.LocalBroadcastManager;
 
 public class ModelService extends Service {
 
-    public static final String ACTION_NO_CACHE = "no cache";
-    public static final String ACTION_HAS_CACHE = "has cache";
+    private static final Valute RUR = new Valute("", "", "RUR", 1, "Рубль", 1.0);
+    public static final String ACTION_LOADING = "loading";
+    public static final String ACTION_CONTENT = "content";
+    public static final String ACTION_RETRY = "retry";
 
     public static Intent intent(Context context) {
         return new Intent(context, ModelService.class);
+    }
+
+    public static IntentFilter intentFilter() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ModelService.ACTION_LOADING);
+        intentFilter.addAction(ModelService.ACTION_CONTENT);
+        intentFilter.addAction(ModelService.ACTION_RETRY);
+        return intentFilter;
     }
 
     private final IBinder binder = new LocalBinder();
@@ -31,9 +42,11 @@ public class ModelService extends Service {
     }
 
     public void loadValutes() {
-        Intent intent = new Intent();
-        intent.setAction(ACTION_NO_CACHE);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        if (cache.contains()) {
+            sendContent();
+        } else {
+            sendLoading();
+        }
 
         AsyncTask<Void, Void, ValCurs> task = new AsyncTask<Void, Void, ValCurs>() {
             @Override
@@ -42,6 +55,7 @@ public class ModelService extends Service {
                 try {
                     String s = serviceIntegration.daily();
                     result = parser.parse(s);
+                    result.getValute().add(1, RUR);
                     cache.replace(result);
                 } catch (ServiceIntegration.IntegrationException | Parser.ParseException e) {
                     e.printStackTrace();
@@ -54,16 +68,32 @@ public class ModelService extends Service {
                 super.onPostExecute(valCurs);
                 if (valCurs == null) {
                     if (cache.contains()) {
-                        //listener.onLoaded(cache.get());
+                        sendContent();
                     } else {
-                        //listener.onFail();
+                        sendRetry();
                     }
                 } else {
-                    //listener.onLoaded(valCurs);
+                    sendContent();
                 }
             }
         };
-        //task.execute();
+        task.execute();
+    }
+
+    public ValCurs getContent() {
+        return cache.get();
+    }
+
+    private void sendRetry() {
+        LocalBroadcastManager.getInstance(ModelService.this).sendBroadcast(new Intent(ACTION_RETRY));
+    }
+
+    private void sendLoading() {
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_LOADING));
+    }
+
+    private void sendContent() {
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_CONTENT));
     }
 
     public Converter getConverter() {

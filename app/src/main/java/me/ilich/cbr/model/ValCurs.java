@@ -1,5 +1,8 @@
 package me.ilich.cbr.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
@@ -7,7 +10,7 @@ import org.simpleframework.xml.Root;
 import java.util.List;
 
 @Root(name = "ValCurs")
-public class ValCurs {
+public class ValCurs implements Parcelable {
 
     private final String date;
     private final String name;
@@ -22,6 +25,24 @@ public class ValCurs {
         this.name = name;
         this.valute = valute;
     }
+
+    protected ValCurs(Parcel in) {
+        date = in.readString();
+        name = in.readString();
+        valute = in.createTypedArrayList(Valute.CREATOR);
+    }
+
+    public static final Creator<ValCurs> CREATOR = new Creator<ValCurs>() {
+        @Override
+        public ValCurs createFromParcel(Parcel in) {
+            return new ValCurs(in);
+        }
+
+        @Override
+        public ValCurs[] newArray(int size) {
+            return new ValCurs[size];
+        }
+    };
 
     @Attribute(name = "name")
     public String getName() {
@@ -59,4 +80,15 @@ public class ValCurs {
         return result;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(date);
+        parcel.writeString(name);
+        parcel.writeTypedList(valute);
+    }
 }

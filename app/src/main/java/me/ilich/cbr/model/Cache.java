@@ -5,23 +5,25 @@ import android.support.annotation.VisibleForTesting;
 
 public class Cache {
 
-    public void replace(ValCurs valute) {
-        //TODO
+    @Nullable
+    private ValCurs valCurs = null;
+
+    public void replace(ValCurs v) {
+        valCurs = v;
     }
 
     @Nullable
     public ValCurs get() {
-        //TODO
-        return null;
+        return valCurs;
     }
 
     @VisibleForTesting
     public void clear() {
-        //TODO
+        valCurs = null;
     }
 
     public boolean contains() {
-        return true;
+        return valCurs != null;
     }
 
 }

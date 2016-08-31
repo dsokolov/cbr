@@ -4,11 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,26 +16,29 @@ import android.support.v7.widget.Toolbar;
 import me.ilich.cbr.R;
 import me.ilich.cbr.model.ModelService;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoadFailFragmet.Callback {
 
     private final ModelServiceConnection serviceConnection = new ModelServiceConnection();
     private ModelService modelService;
     private boolean bound = false;
     private LocalBroadcastReceiver broadcastReceiver = new LocalBroadcastReceiver();
 
+    private ConverterFragment converterFragment;
+    private boolean isFirstStart;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ModelService.ACTION_NO_CACHE);
-        intentFilter.addAction(ModelService.ACTION_HAS_CACHE);
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, ModelService.intentFilter());
         bindService(ModelService.intent(this), serviceConnection, BIND_AUTO_CREATE);
-        if (savedInstanceState == null) {
-            //getSupportFragmentManager().beginTransaction().replace(R.id.container_content, LoadingFragment.create()).commit();
-            //getSupportFragmentManager().beginTransaction().replace(R.id.container_content, ConverterFragment.create()).commit();
+        isFirstStart = savedInstanceState == null;
+        if (savedInstanceState != null) {
+            Fragment contentFragment = getSupportFragmentManager().findFragmentById(R.id.container_content);
+            if (contentFragment instanceof ConverterFragment) {
+                converterFragment = (ConverterFragment) contentFragment;
+            }
         }
     }
 
@@ -50,8 +53,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onBound() {
+        if (isFirstStart) {
+            modelService.loadValutes();
+        }
+    }
+
+    @Override
+    public void onRetryLoading() {
         modelService.loadValutes();
-        getSupportFragmentManager().beginTransaction().replace(R.id.container_content, ConverterFragment.create()).commit();
     }
 
     private class ModelServiceConnection implements ServiceConnection {
@@ -74,8 +83,19 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(ModelService.ACTION_NO_CACHE)) {
+            if (intent.getAction().equals(ModelService.ACTION_LOADING)) {
+                converterFragment = null;
                 getSupportFragmentManager().beginTransaction().replace(R.id.container_content, LoadingFragment.create()).commit();
+            } else if (intent.getAction().equals(ModelService.ACTION_RETRY)) {
+                converterFragment = null;
+                getSupportFragmentManager().beginTransaction().replace(R.id.container_content, LoadFailFragmet.create()).commit();
+            } else if (intent.getAction().equals(ModelService.ACTION_CONTENT)) {
+                if (converterFragment == null) {
+                    converterFragment = ConverterFragment.create(modelService.getContent());
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container_content, converterFragment).commit();
+                } else {
+                    //TODO converterFragment.setContent(...);
+                }
             }
         }
 
