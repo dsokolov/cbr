@@ -20,4 +20,8 @@ public class Cache {
         //TODO
     }
 
+    public boolean contains() {
+        return true;
+    }
+
 }

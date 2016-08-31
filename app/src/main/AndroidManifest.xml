@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="me.ilich.cbr">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -22,7 +23,13 @@
 
         <activity
             android:name=".view.ValuteListActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:parentActivityName=".view.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="UnusedAttribute">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".view.MainActivity" />
+        </activity>
 
     </application>
 
