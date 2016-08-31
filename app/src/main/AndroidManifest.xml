@@ -31,6 +31,8 @@
                 android:value=".view.MainActivity" />
         </activity>
 
+        <service android:name=".model.ModelService"/>
+
     </application>
 
 </manifest>
