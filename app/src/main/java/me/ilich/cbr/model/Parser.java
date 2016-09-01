@@ -24,8 +24,7 @@ public class Parser {
         }
         Reader reader = new StringReader(xml);
         try {
-            ValCurs valCurs = serializer.read(ValCurs.class, reader, false);
-            return valCurs;
+            return serializer.read(ValCurs.class, reader, false);
         } catch (Exception e) {
             throw new ParseException(e);
         }

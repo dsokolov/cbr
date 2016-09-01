@@ -19,6 +19,8 @@ public class ValuteListFragment extends ViewModelFragment {
     private static final String ARG_SELECTED_VALUTE = "selected valute";
 
     private static final String STATE_VALUTES = "valutes";
+    private static final int VIEW_TYPE_NORMAL = 0;
+    private static final int VIEW_TYPE_SELECTED = 1;
 
     public static ValuteListFragment create(Valute selectedValute) {
         ValuteListFragment f = new ValuteListFragment();
@@ -27,8 +29,6 @@ public class ValuteListFragment extends ViewModelFragment {
         f.setArguments(b);
         return f;
     }
-
-    private RecyclerView recyclerView;
     private Adapter adapter = new Adapter();
     private ArrayList<Valute> valutes = new ArrayList<>();
     private Valute selectedValute;
@@ -37,12 +37,6 @@ public class ValuteListFragment extends ViewModelFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         selectedValute = getArguments().getParcelable(ARG_SELECTED_VALUTE);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(STATE_VALUTES, valutes);
     }
 
     @Nullable
@@ -54,7 +48,7 @@ public class ValuteListFragment extends ViewModelFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        recyclerView = (RecyclerView) view.findViewById(R.id.valute_list);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.valute_list);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         if (savedInstanceState == null) {
@@ -70,6 +64,18 @@ public class ValuteListFragment extends ViewModelFragment {
         } else {
             valutes = savedInstanceState.getParcelableArrayList(STATE_VALUTES);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(STATE_VALUTES, valutes);
+    }
+
+    public interface Callback {
+
+        void onValuteClick(Valute valute);
+
     }
 
     private class ViewHolder extends RecyclerView.ViewHolder {
@@ -110,22 +116,7 @@ public class ValuteListFragment extends ViewModelFragment {
         }
     }
 
-    private static final int VIEW_TYPE_NORMAL = 0;
-    private static final int VIEW_TYPE_SELECTED = 1;
-
     private class Adapter extends RecyclerView.Adapter<ViewHolder> {
-
-        @Override
-        public int getItemViewType(int position) {
-            Valute curValute = valutes.get(position);
-            final int result;
-            if (curValute.equals(selectedValute)) {
-                result = VIEW_TYPE_SELECTED;
-            } else {
-                result = VIEW_TYPE_NORMAL;
-            }
-            return result;
-        }
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -151,15 +142,21 @@ public class ValuteListFragment extends ViewModelFragment {
         }
 
         @Override
+        public int getItemViewType(int position) {
+            Valute curValute = valutes.get(position);
+            final int result;
+            if (curValute.equals(selectedValute)) {
+                result = VIEW_TYPE_SELECTED;
+            } else {
+                result = VIEW_TYPE_NORMAL;
+            }
+            return result;
+        }
+
+        @Override
         public int getItemCount() {
             return valutes.size();
         }
-
-    }
-
-    public interface Callback {
-
-        void onValuteClick(Valute valute);
 
     }
 
