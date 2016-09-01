@@ -9,6 +9,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 public class ModelService extends Service implements Model {
 
@@ -43,10 +44,13 @@ public class ModelService extends Service implements Model {
 
     @Override
     public void loadValutes() {
+        Log.v("Sokolov", "A");
         if (cache.containsValCurs()) {
             sendContent();
         } else {
+            Log.v("Sokolov", "B");
             sendLoading();
+            Log.v("Sokolov", "C");
         }
 
         AsyncTask<Void, Void, ValCurs> task = new AsyncTask<Void, Void, ValCurs>() {

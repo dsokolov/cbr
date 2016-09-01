@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,6 +16,10 @@ public class Cache {
     private static final String FILE_NAME_VALCURS = "valcurs.cache";
 
     private static void writeToFile(Context context, String fileName, Object object) {
+        File f = context.getFileStreamPath(fileName);
+        if (f != null && f.exists()) {
+            f.delete();
+        }
         FileOutputStream fos = null;
         ObjectOutputStream os = null;
         try {
@@ -43,29 +48,32 @@ public class Cache {
 
     private static <T> T readFromFile(Context context, String fileName) {
         T result = null;
-        FileInputStream fis = null;
-        ObjectInputStream is = null;
-        try {
-            fis = context.openFileInput(fileName);
-            is = new ObjectInputStream(fis);
-            //noinspection unchecked
-            result = (T) is.readObject();
-        } catch (ClassNotFoundException | IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+        File f = context.getFileStreamPath(fileName);
+        if (f != null && f.exists()) {
+            FileInputStream fis = null;
+            ObjectInputStream is = null;
+            try {
+                fis = context.openFileInput(fileName);
+                is = new ObjectInputStream(fis);
+                //noinspection unchecked
+                result = (T) is.readObject();
+            } catch (ClassNotFoundException | IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (is != null) {
+                    try {
+                        is.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-            if (fis != null) {
-                try {
-                    fis.close();
+                if (fis != null) {
+                    try {
+                        fis.close();
 
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }

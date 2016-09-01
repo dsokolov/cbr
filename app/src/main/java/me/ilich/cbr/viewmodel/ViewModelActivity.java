@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import me.ilich.cbr.model.Model;
 import me.ilich.cbr.model.ModelService;
@@ -19,7 +20,9 @@ public class ViewModelActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.v("Sokolov", "-1");
         super.onCreate(savedInstanceState);
+        Log.v("Sokolov", "0");
         if (!bound) {
             bindService(ModelService.intent(this), serviceConnection, BIND_AUTO_CREATE);
         }
