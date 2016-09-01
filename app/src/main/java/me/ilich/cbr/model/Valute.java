@@ -7,8 +7,10 @@ import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
+import java.io.Serializable;
+
 @Root(name = "Valute")
-public class Valute implements Parcelable {
+public class Valute implements Parcelable, Serializable {
 
     private final String id;
     private final String numCode;

@@ -10,7 +10,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 
-public class ModelService extends Service {
+public class ModelService extends Service implements Model {
 
     private static final Valute RUR = new Valute("", "", "RUR", 1, "Рубль", 1.0);
     public static final String ACTION_LOADING = "loading";
@@ -30,7 +30,7 @@ public class ModelService extends Service {
     }
 
     private final IBinder binder = new LocalBinder();
-    private final Cache cache = new Cache();
+    private final Cache cache = new Cache(this);
     private final Converter converter = new Converter();
     private final Parser parser = new Parser();
     private final ServiceIntegration serviceIntegration = new ServiceIntegration();
@@ -41,8 +41,9 @@ public class ModelService extends Service {
         return binder;
     }
 
+    @Override
     public void loadValutes() {
-        if (cache.contains()) {
+        if (cache.containsValCurs()) {
             sendContent();
         } else {
             sendLoading();
@@ -55,8 +56,8 @@ public class ModelService extends Service {
                 try {
                     String s = serviceIntegration.daily();
                     result = parser.parse(s);
-                    result.getValute().add(1, RUR);
-                    cache.replace(result);
+                    result.getValute().add(0, RUR);
+                    cache.replaceValCurs(result);
                 } catch (ServiceIntegration.IntegrationException | Parser.ParseException e) {
                     e.printStackTrace();
                 }
@@ -67,7 +68,7 @@ public class ModelService extends Service {
             protected void onPostExecute(ValCurs valCurs) {
                 super.onPostExecute(valCurs);
                 if (valCurs == null) {
-                    if (cache.contains()) {
+                    if (cache.containsValCurs()) {
                         sendContent();
                     } else {
                         sendRetry();
@@ -80,8 +81,14 @@ public class ModelService extends Service {
         task.execute();
     }
 
+    @Override
     public ValCurs getContent() {
-        return cache.get();
+        return cache.getValCurs();
+    }
+
+    @Override
+    public Converter getConverter() {
+        return converter;
     }
 
     private void sendRetry() {
@@ -94,10 +101,6 @@ public class ModelService extends Service {
 
     private void sendContent() {
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTION_CONTENT));
-    }
-
-    public Converter getConverter() {
-        return converter;
     }
 
     public class LocalBinder extends Binder {

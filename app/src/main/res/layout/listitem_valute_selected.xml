@@ -4,8 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:paddingBottom="@dimen/paddin_listitem"
     android:paddingLeft="@dimen/content_padding"
-    android:paddingRight="@dimen/content_padding">
+    android:paddingRight="@dimen/content_padding"
+    android:paddingTop="@dimen/paddin_listitem">
 
     <TextView
         android:id="@+id/valute_title"

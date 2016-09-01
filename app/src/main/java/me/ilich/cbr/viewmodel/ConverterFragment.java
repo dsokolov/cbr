@@ -1,11 +1,10 @@
-package me.ilich.cbr.view;
+package me.ilich.cbr.viewmodel;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -17,32 +16,25 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
+import java.text.ParseException;
 
 import me.ilich.cbr.R;
-import me.ilich.cbr.model.Model;
 import me.ilich.cbr.model.ValCurs;
 import me.ilich.cbr.model.Valute;
 
-public class ConverterFragment extends Fragment implements View.OnClickListener {
+public class ConverterFragment extends ViewModelFragment implements View.OnClickListener {
 
     private static final int REQUEST_CODE_SELECT_SOURCE_VALUTE = 1;
     private static final int REQUEST_CODE_SELECT_TARGET_VALUTE = 2;
     private static final String STATE_SOURCE_VALUTE = "source valute";
     private static final String STATE_TARGET_VALUTE = "target valute";
 
-    private static final String ARG_CONTENT = "content";
-
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("###.##");
 
-    public static ConverterFragment create(ValCurs content) {
-        ConverterFragment converterFragment = new ConverterFragment();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(ARG_CONTENT, content);
-        converterFragment.setArguments(bundle);
-        return converterFragment;
+    public static ConverterFragment create() {
+        return new ConverterFragment();
     }
 
-    private ValCurs valCurs;
     private Valute sourceValute;
     private Valute targetValute;
 
@@ -68,7 +60,7 @@ public class ConverterFragment extends Fragment implements View.OnClickListener 
             sourceValute = valute;
             sourceTextInputLayout.requestFocus();
             processButtonsLabels();
-            convertFromTargetToSource();
+            convertFromSourceToTarget();
         } else if (requestCode == REQUEST_CODE_SELECT_TARGET_VALUTE && resultCode == Activity.RESULT_OK) {
             Valute valute = ValuteListActivity.extractValute(data);
             if (valute.equals(sourceValute)) {
@@ -77,7 +69,7 @@ public class ConverterFragment extends Fragment implements View.OnClickListener 
             targetValute = valute;
             targetTextInputLayout.requestFocus();
             processButtonsLabels();
-            convertFromTargetToSource();
+            convertFromSourceToTarget();
         }
     }
 
@@ -85,7 +77,7 @@ public class ConverterFragment extends Fragment implements View.OnClickListener 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null) {
-            valCurs = getArguments().getParcelable(ARG_CONTENT);
+            ValCurs valCurs = getModel().getContent();
             for (Valute valute : valCurs.getValute()) {
                 if (valute.getCharCode().equals("RUR")) {
                     sourceValute = valute;
@@ -145,25 +137,18 @@ public class ConverterFragment extends Fragment implements View.OnClickListener 
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.change_source_valute:
-                onChangeSourceValuteClick(view);
+                startActivityForResult(ValuteListActivity.intent(getContext(), sourceValute), REQUEST_CODE_SELECT_SOURCE_VALUTE);
                 break;
             case R.id.change_target_valute:
-                onChangeTargetValuteClick(view);
+                startActivityForResult(ValuteListActivity.intent(getContext(), targetValute), REQUEST_CODE_SELECT_TARGET_VALUTE);
                 break;
         }
     }
 
-    public void onChangeSourceValuteClick(View view) {
-        startActivityForResult(ValuteListActivity.intent(getContext()), REQUEST_CODE_SELECT_SOURCE_VALUTE);
-    }
-
-    public void onChangeTargetValuteClick(View view) {
-        startActivityForResult(ValuteListActivity.intent(getContext()), REQUEST_CODE_SELECT_TARGET_VALUTE);
-    }
-
     private void processButtonsLabels() {
-        sourceChangeButton.setText(sourceValute.getName());
-        targetChangeButton.setText(targetValute.getName());
+        String s = getString(R.string.converter_valute_label_mask);
+        sourceChangeButton.setText(String.format(s, sourceValute.getName(), sourceValute.getCharCode()));
+        targetChangeButton.setText(String.format(s, targetValute.getName(), targetValute.getCharCode()));
     }
 
     private void processDetailsText() {
@@ -177,30 +162,34 @@ public class ConverterFragment extends Fragment implements View.OnClickListener 
     }
 
     private void convertFromSourceToTarget() {
-        targetEditText.removeTextChangedListener(targetToSourceTextWatcher);
-        try {
-            double sourceAmount = Double.parseDouble(sourceEditText.getText().toString());
-            double targetAmount = Model.getInstance().getConverter().convert(sourceValute, targetValute, sourceAmount);
-            targetEditText.setText(DECIMAL_FORMAT.format(targetAmount));
-        } catch (NumberFormatException e) {
-            targetEditText.getText().clear();
+        if (getModel() != null) {
+            targetEditText.removeTextChangedListener(targetToSourceTextWatcher);
+            try {
+                double sourceAmount = DECIMAL_FORMAT.parse(sourceEditText.getText().toString()).doubleValue();
+                double targetAmount = getModel().getConverter().convert(sourceValute, targetValute, sourceAmount);
+                targetEditText.setText(DECIMAL_FORMAT.format(targetAmount));
+            } catch (ParseException e) {
+                targetEditText.getText().clear();
+            }
+            targetEditText.addTextChangedListener(targetToSourceTextWatcher);
+            processDetailsText();
         }
-        targetEditText.addTextChangedListener(targetToSourceTextWatcher);
-        processDetailsText();
     }
 
 
     private void convertFromTargetToSource() {
-        sourceEditText.removeTextChangedListener(sourceToTargetTextWatcher);
-        try {
-            double sourceAmount = Double.parseDouble(targetEditText.getText().toString());
-            double targetAmount = Model.getInstance().getConverter().convert(targetValute, sourceValute, sourceAmount);
-            sourceEditText.setText(DECIMAL_FORMAT.format(targetAmount));
-        } catch (NumberFormatException e) {
-            sourceEditText.getText().clear();
+        if (getModel() != null) {
+            sourceEditText.removeTextChangedListener(sourceToTargetTextWatcher);
+            try {
+                double sourceAmount = DECIMAL_FORMAT.parse(targetEditText.getText().toString()).doubleValue();
+                double targetAmount = getModel().getConverter().convert(targetValute, sourceValute, sourceAmount);
+                sourceEditText.setText(DECIMAL_FORMAT.format(targetAmount));
+            } catch (ParseException e) {
+                sourceEditText.getText().clear();
+            }
+            sourceEditText.addTextChangedListener(sourceToTargetTextWatcher);
+            processDetailsText();
         }
-        sourceEditText.addTextChangedListener(sourceToTargetTextWatcher);
-        processDetailsText();
     }
 
     private class SourceToTargetTextWatcher implements TextWatcher {

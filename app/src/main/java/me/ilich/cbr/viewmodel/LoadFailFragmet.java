@@ -1,4 +1,4 @@
-package me.ilich.cbr.view;
+package me.ilich.cbr.viewmodel;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

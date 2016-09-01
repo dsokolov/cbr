@@ -21,8 +21,6 @@ public class ServiceIntegration {
     public String daily() throws IntegrationException {
         try {
             URL url = new URL("http://www.cbr.ru/scripts/XML_daily.asp");
-            //URL url = new URL("http://ya.ru");
-            //URL url = new URL("http", "cbr.ru", 80, "scripts/XML_daily.asp");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setInstanceFollowRedirects(true);
             connection.setConnectTimeout(4000);
