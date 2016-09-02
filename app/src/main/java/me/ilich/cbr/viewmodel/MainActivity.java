@@ -35,9 +35,19 @@ public class MainActivity extends ViewModelActivity implements LoadFailFragmet.C
     }
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Fragment contentFragment = getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT_CONVERTER);
+        if (contentFragment instanceof ConverterFragment) {
+            converterFragment = (ConverterFragment) contentFragment;
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        converterFragment = null;
     }
 
     @Override

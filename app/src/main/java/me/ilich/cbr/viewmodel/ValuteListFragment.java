@@ -36,6 +36,7 @@ public class ValuteListFragment extends ViewModelFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
         selectedValute = getArguments().getParcelable(ARG_SELECTED_VALUTE);
     }
 

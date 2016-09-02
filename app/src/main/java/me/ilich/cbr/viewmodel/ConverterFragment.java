@@ -76,6 +76,7 @@ public class ConverterFragment extends ViewModelFragment implements View.OnClick
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
         if (savedInstanceState == null) {
             ValCurs valCurs = getModel().getContent();
             for (Valute valute : valCurs.getValute()) {
@@ -162,7 +163,7 @@ public class ConverterFragment extends ViewModelFragment implements View.OnClick
     }
 
     private void convertFromSourceToTarget() {
-        if (getModel() != null) {
+        if (getModel() != null) {  //null после поворота и onActivityResult
             targetEditText.removeTextChangedListener(targetToSourceTextWatcher);
             try {
                 double sourceAmount = DECIMAL_FORMAT.parse(sourceEditText.getText().toString()).doubleValue();
