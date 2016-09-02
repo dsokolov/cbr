@@ -14,10 +14,25 @@ public class ValuteListActivity extends ViewModelActivity implements ValuteListF
 
     public static String EXTRA_VALUTE = "valute";
     private static final String EXTRA_SELECTED_VALUTE = "selected valute";
+    private static final String EXTRA_MODE = "mode";
 
-    public static Intent intent(Context context, Valute selectedValute) {
+    private enum Mode {
+        SOURCE,
+        TARGET
+    }
+
+    public static Intent source(Context context, Valute selectedValute) {
+        return intent(context, selectedValute, Mode.SOURCE);
+    }
+
+    public static Intent target(Context context, Valute selectedValute) {
+        return intent(context, selectedValute, Mode.TARGET);
+    }
+
+    private static Intent intent(Context context, Valute selectedValute, Mode mode) {
         Intent intent = new Intent(context, ValuteListActivity.class);
         intent.putExtra(EXTRA_SELECTED_VALUTE, (Parcelable) selectedValute);
+        intent.putExtra(EXTRA_MODE, mode);
         return intent;
     }
 
@@ -36,6 +51,15 @@ public class ValuteListActivity extends ViewModelActivity implements ValuteListF
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         selectedValute = getIntent().getParcelableExtra(EXTRA_SELECTED_VALUTE);
+        Mode mode = (Mode) getIntent().getSerializableExtra(EXTRA_MODE);
+        switch (mode) {
+            case SOURCE:
+                setTitle(R.string.valute_list_title_source);
+                break;
+            case TARGET:
+                setTitle(R.string.valute_list_title_target);
+                break;
+        }
     }
 
     @Override

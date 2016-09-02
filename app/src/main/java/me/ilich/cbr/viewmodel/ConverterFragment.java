@@ -137,10 +137,10 @@ public class ConverterFragment extends ViewModelFragment implements View.OnClick
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.change_source_valute:
-                startActivityForResult(ValuteListActivity.intent(getContext(), sourceValute), REQUEST_CODE_SELECT_SOURCE_VALUTE);
+                startActivityForResult(ValuteListActivity.source(getContext(), sourceValute), REQUEST_CODE_SELECT_SOURCE_VALUTE);
                 break;
             case R.id.change_target_valute:
-                startActivityForResult(ValuteListActivity.intent(getContext(), targetValute), REQUEST_CODE_SELECT_TARGET_VALUTE);
+                startActivityForResult(ValuteListActivity.target(getContext(), targetValute), REQUEST_CODE_SELECT_TARGET_VALUTE);
                 break;
         }
     }

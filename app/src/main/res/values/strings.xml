@@ -8,4 +8,6 @@
     <string name="retry">Повторить</string>
     <string name="error_load">При загрузке произошла ошибка</string>
     <string name="converter_valute_label_mask">%1$s (%2$s)</string>
+    <string name="valute_list_title_source">Исходная валюта</string>
+    <string name="valute_list_title_target">Целевая валюта</string>
 </resources>
